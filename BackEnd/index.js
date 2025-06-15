@@ -1,10 +1,18 @@
-const express = require('express');
-const cors = require('cors');
-const app = express();
-const PORT = 5000;
+// backend/index.js
 
+const express = require('express');
+const cors    = require('cors');
+const app     = express();
+const PORT    = process.env.PORT || 5000;  // Use Render’s assigned port or 5000 locally
+
+// Middleware
 app.use(cors());
 app.use(express.json());
+
+// Health‑check route
+app.get('/', (req, res) => {
+  res.send('👋 Task Manager API running — use /tasks');
+});
 
 let tasks = [];
 let nextId = 1;
@@ -12,7 +20,9 @@ let nextId = 1;
 // Create a new task
 app.post('/tasks', (req, res) => {
   const { name, description } = req.body;
-  if (!name) return res.status(400).json({ error: 'Task name required' });
+  if (!name) {
+    return res.status(400).json({ error: 'Task name required' });
+  }
   const task = { id: nextId++, name, description: description || '' };
   tasks.push(task);
   res.status(201).json(task);
@@ -28,7 +38,9 @@ app.put('/tasks/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);
   const { name, description } = req.body;
   const task = tasks.find(t => t.id === id);
-  if (!task) return res.status(404).json({ error: 'Task not found' });
+  if (!task) {
+    return res.status(404).json({ error: 'Task not found' });
+  }
   task.name = name || task.name;
   task.description = description !== undefined ? description : task.description;
   res.json(task);
@@ -38,11 +50,14 @@ app.put('/tasks/:id', (req, res) => {
 app.delete('/tasks/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);
   const index = tasks.findIndex(t => t.id === id);
-  if (index === -1) return res.status(404).json({ error: 'Task not found' });
+  if (index === -1) {
+    return res.status(404).json({ error: 'Task not found' });
+  }
   tasks.splice(index, 1);
   res.status(204).end();
 });
 
+// Start server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
