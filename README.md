@@ -17,3 +17,4 @@ npm run dev
 ```
 
 Open http://localhost:3000 in your browser.
+Vercel Live Deployment - https://my-task-manager-app-dusky.vercel.app
